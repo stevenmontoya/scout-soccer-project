@@ -1,6 +1,13 @@
 from main import app
+from fastapi import Body
 from repository.stadistics_repository import find_all
 from repository.stadistics_repository import find_team
+from repository.stadistics_repository import save_all
+
+
+@app.post('/stadistics', status_code=201)
+async def list_stadistics(teams_stadistics=Body(...)):
+    return save_all(teams_stadistics)
 
 
 @app.get('/stadistics', status_code=200)
