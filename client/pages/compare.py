@@ -1,13 +1,7 @@
 import streamlit as st
-import requests
 import plotly.graph_objects as go
 from components.title_component import title_component
-
-
-def get_data_from_stadistics(key):
-    response = requests.get('http://localhost:8000/stadistics')
-    team_stadistics = response.json()
-    return [stadistic[key] for stadistic in team_stadistics]
+from api.stadistics_api import get_all, get_stadistics_team
 
 
 def draw_compare_page():
@@ -16,21 +10,17 @@ def draw_compare_page():
     team_1, team_2 = st.beta_columns(2)
 
     team_a = team_1.selectbox(
-        'Select Team A', get_data_from_stadistics('team'))
+        'Select Team A', get_all('team'))
 
     team_b = team_2.selectbox(
-        'Select Team B', get_data_from_stadistics('team'))
+        'Select Team B', get_all('team'))
 
     if ((team_a) and (team_b)):
         col1, col2, col3, col4 = st.beta_columns(4)
 
-        response_team_a = requests.get(
-            f'http://localhost:8000/stadistics/teams/{team_a}')
-        team_s_a = response_team_a.json()
+        team_s_a = get_stadistics_team(team_a)
 
-        response_team_b = requests.get(
-            f'http://localhost:8000/stadistics/teams/{team_b}')
-        team_s_b = response_team_b.json()
+        team_s_b = get_stadistics_team(team_a)
 
         del team_s_a['team']
         del team_s_a['top_scored']

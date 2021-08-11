@@ -1,15 +1,9 @@
 import streamlit as st
-import requests
 import plotly.graph_objects as go
 import plotly.express as px
 import pandas as pd
 from styles import add_button_style
-
-
-def get_data_from_stadistics(key):
-    response = requests.get('http://localhost:8000/stadistics')
-    team_stadistics = response.json()
-    return [stadistic[key] for stadistic in team_stadistics]
+from api.stadistics_api import get_all
 
 
 def draw_bar(x_data, y_data, title):
@@ -47,9 +41,7 @@ def draw_conditional_button(button, buttonId, query, y_data,  title, fn):
 
 def draw_heat_map_corr(button):
     if (button.button('Heat map')):
-        response = requests.get(
-            f'http://localhost:8000/stadistics')
-        team_stadisticss = response.json()
+        team_stadisticss = get_all()
         df = pd.DataFrame.from_records(team_stadisticss)
         df = df.set_index('team')
         df = df.drop('top_scored', axis=1)
@@ -69,24 +61,24 @@ def draw_dash_board():
     goal_button, goal_conceded_button, possession_button, shots_button, cards_button, extra_time_button, heat_map_button = st.beta_columns(
         7)
 
-    teams = get_data_from_stadistics('team')
+    teams = get_all('team')
 
     draw_conditional_button(goal_button, 'Goals',
-                            'goal_scored', teams, 'Total goals', get_data_from_stadistics)
+                            'goal_scored', teams, 'Total goals', get_all)
 
     draw_conditional_button(goal_conceded_button, 'Goals conceded',
-                            'goal_conceded', teams, 'Total goals', get_data_from_stadistics)
+                            'goal_conceded', teams, 'Total goals', get_all)
 
     draw_conditional_button(possession_button, 'Mean possession',
-                            'mean_possession', teams, 'Possession', get_data_from_stadistics)
+                            'mean_possession', teams, 'Possession', get_all)
 
     draw_conditional_button(shots_button, 'Total shots',
-                            'shots', teams, 'Total shots', get_data_from_stadistics)
+                            'shots', teams, 'Total shots', get_all)
 
     draw_conditional_button(cards_button, 'Total cards',
-                            'yellow_cards', teams, 'Total cards', get_data_from_stadistics)
+                            'yellow_cards', teams, 'Total cards', get_all)
 
     draw_conditional_button(extra_time_button, 'Extra times',
-                            'extra_times', teams, 'Extra times', get_data_from_stadistics)
+                            'extra_times', teams, 'Extra times', get_all)
 
     draw_heat_map_corr(heat_map_button)

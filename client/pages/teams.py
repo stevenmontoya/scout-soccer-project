@@ -1,28 +1,22 @@
 import streamlit as st
-import requests
-
-
-def get_data_from_stadistics(key):
-    response = requests.get('http://localhost:8000/stadistics')
-    team_stadistics = response.json()
-    return [stadistic[key] for stadistic in team_stadistics]
+from api.stadistics_api import get_all, get_stadistics_team
+from api.teams_api import get_squad
 
 
 def draw_teams_page():
-    team = st.selectbox('', get_data_from_stadistics('team'))
+    team = st.selectbox('', get_all('team'))
     if (team):
         draw_team_info(team)
 
 
 def draw_team_info(team):
-    response = requests.get(f'http://localhost:8000/stadistics/teams/{team}')
-    team_stadisticss = response.json()
+    team_stadisticss = get_stadistics_team(team)
     team = Team(team_stadisticss)
     team.draw_info()
 
 
 def draw_player(team):
-    response = requests.get(f'http://localhost:8000/squads/{team}')
+    response = get_squad(team)
     squad = response.json()
     players = [Player(player) for player in squad]
 
