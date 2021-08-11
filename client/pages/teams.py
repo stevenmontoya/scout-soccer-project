@@ -77,5 +77,5 @@ class Team(MapperDict):
                 margin-left: 40%;
             }
         </style>""", unsafe_allow_html=True)
-        if (st.button('View Squad')):
-            draw_player(self.team)
+        # if (st.button('View Squad')):
+        #     draw_player(self.team)
