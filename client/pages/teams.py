@@ -1,6 +1,8 @@
 import streamlit as st
+import plotly.graph_objects as go
 from api.stadistics_api import get_all, get_stadistics_team
 from api.teams_api import get_squad
+from api.utils.mapper import json_to_dataframe
 
 
 def draw_teams_page():
@@ -54,28 +56,57 @@ class Team(MapperDict):
     def __init__(self, iterable=(), **kwargs):
         super().__init__(iterable, **kwargs)
 
+    def __generate_stadistic_dict__(self):
+        return {'Possession': 'mean_possession', 'Goals': 'goal_scored', 'Goals conceded': 'goal_conceded',
+                'Penalties': 'penalties', 'Shots': 'shots', 'Yellow Cards': 'yellow_cards', 'Red Cards': 'red_cards', 'Extra times': 'extra_times'}
+
+    def __metric_values__(self, key, filter_tag):
+        dc = self.__generate_stadistic_dict__()
+        teams = get_all()
+        df = json_to_dataframe(teams)
+
+        if filter_tag == 'min':
+            return df[dc[key]].min()
+        elif filter_tag == 'max':
+            return df[dc[key]].max()
+
+        return df[dc[key]].mean()
+
     def draw_info(self):
         col1, col2, col3 = st.beta_columns(3)
+        col1, col2 = st.beta_columns(2)
 
+        stadistic_option = ''
+        compare_stadistic_option = ''
         with col1:
-            st.write(f' ### Possession: ', self.mean_possession)
-            st.write(f' ### Goals: ', self.goal_scored)
-            st.write(f' ### Goals: conceded ', self.goal_conceded)
+            stadistic_option = st.selectbox('', ('Possession', 'Goals', 'Goals conceded',
+                                                 'Penalties', 'Shots', 'Yellow Cards', 'Red Cards',  'Extra times'))
         with col2:
-            st.write(f' ### Penalties: ', self.penalties)
-            st.write(f' ### Shots: ', self.shots)
+            compare_stadistic_option = st.selectbox('', ('mean', 'max', 'min'))
 
-        with col3:
-            st.write(f' ### Leading Score:  ', self.top_scored)
-            st.write(f' ### Cards: ', self.mean_possession)
-            st.write(f' ### Extra times: ', self.extra_times)
+        compare_value = self.__metric_values__(
+            stadistic_option, compare_stadistic_option)
 
-        m = st.markdown("""
+        fig = go.Figure(go.Bar(
+            x=[compare_value, self.__getattribute__(
+                self.__generate_stadistic_dict__()[stadistic_option])],
+            y=[f'{compare_stadistic_option}', f'{self.team}'],
+            orientation='h'))
+
+        fig.update_layout(
+            autosize=False,
+            width=1300,
+            height=700,)
+
+        st.plotly_chart(fig, config={
+            'displayModeBar': False
+        })
+
+
+m = st.markdown("""
         <style>
             div.stButton > button:first-child {
                 margin-top: 4em;
                 margin-left: 40%;
             }
         </style>""", unsafe_allow_html=True)
-        # if (st.button('View Squad')):
-        #     draw_player(self.team)
