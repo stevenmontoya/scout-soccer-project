@@ -20,7 +20,7 @@ def draw_compare_page():
 
         team_s_a = get_stadistics_team(team_a)
 
-        team_s_b = get_stadistics_team(team_a)
+        team_s_b = get_stadistics_team(team_b)
 
         del team_s_a['team']
         del team_s_a['top_scored']
