@@ -23,15 +23,16 @@ git clone https://github.com/stevenmontoya/scout-soccer-project.git
 Use the command below to install the project dependencies
 
 ```bash
-cd scout-projec
+cd scout-project
 pip install -r requirements.txt
 ```
 
 Install Jupyter
 
 ```bash
-cd scout-projec
-pip install -r requirements.txt
+cd scout-project
+conda install -c conda-forge jupyterlab
+
 ```
 
 ## Run Locally
